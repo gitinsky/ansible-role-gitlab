@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+defaultbox = "ubuntu/trusty64"
+box = ENV['BOX'] || defaultbox
+
+ENV['ANSIBLE_ROLES_PATH'] = "../../"
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = box
+
+  config.vm.define "gitlab" do |gitlab_cfg|
+    gitlab_cfg.vm.hostname = "gitlab"
+    gitlab_cfg.vm.network "private_network", type: "dhcp"
+    gitlab_cfg.vm.provider :virtualbox do |v|
+      v.name = "gitlab"
+      v.memory = 1536
+      # v.gui = true
+    end
+  end
+
+  config.vm.provision :ansible do |ansible|
+    ansible.playbook = "vagrant.yml"
+    ansible.sudo = true
+    # ansible.tags = ['debug']
+    ansible.groups = {
+      "vagrant" => ["gitlab", "postgres"],
+    }
+    ansible.extra_vars = {
+      ansible_ssh_user: 'vagrant',
+      hbase_standalone:   true,
+    }
+
+  end
+
+end

@@ -1,0 +1,34 @@
+- name: Install and configure the necessary dependencies
+  apt: name={{ item }}
+  with_items:
+      - curl
+      - openssh-server
+      - ca-certificates
+      - postfix
+      - apt-transport-https
+
+- name: Add the GitLab package server key
+  apt_key: url=https://packages.gitlab.com/gpg.key state=present
+
+- name: Add the GitLab package server
+  apt_repository: repo='{{ item }} https://packages.gitlab.com/gitlab/gitlab-ce/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release }} main'
+                  state=present
+                  update_cache=yes
+  with_items:
+      - deb
+      - deb-src
+
+- name: Install the GitLab package
+  apt: name=gitlab-ce
+
+- name: Check that gitlab is unavailable
+  uri: url=http://127.0.0.1 return_content=yes
+  register: webpage
+  failed_when: false
+  changed_when: "webpage.content is not defined or 'gitlab' not in webpage.content"
+  notify: gitlab-ctl reconfigure
+
+- name: Put gitlab.rb configuration
+  template: src=gitlab.rb dest=/etc/gitlab/gitlab.rb
+  notify: gitlab-ctl reconfigure
+  when: gitlab_enable_configuration

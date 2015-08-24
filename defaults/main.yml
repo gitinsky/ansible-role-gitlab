@@ -1,0 +1,7 @@
+gitlab_enable_configuration: yes
+gitlab_url: "http://{{ ansible_default_ipv4.address }}"
+gitlab_ci_external_url: "http://{{ ansible_default_ipv4.address }}"
+gitlab_email_from: "gitlab@{{ ansible_fqdn }}"
+gitlab_email_display_name: Gitlab
+gitlab_nginx_listen_https: false
+gitlab_ci_nginx_listen_https: false

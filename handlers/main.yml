@@ -1,0 +1,10 @@
+- name: gitlab-ctl reconfigure
+  shell: gitlab-ctl reconfigure | tee /tmp/gitlab-reconfigure.log
+  register: gitlab_reconfigure
+  failed_when: "'gitlab Reconfigured' not in gitlab_reconfigure.stdout"
+  notify: gitlab web check
+
+- name: gitlab web check
+  uri: url=http://127.0.0.1 return_content=yes
+  register: gitlab_web_check
+  failed_when: "gitlab_web_check.content is not defined or 'gitlab' not in gitlab_web_check.content"
