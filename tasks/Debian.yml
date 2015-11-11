@@ -1,4 +1,4 @@
-- name: Install and configure the necessary dependencies
+- name: Install and configure the necessary dependencies and python-httplib2 for ansible
   apt: name={{ item }}
   with_items:
       - curl
@@ -6,6 +6,7 @@
       - ca-certificates
       - postfix
       - apt-transport-https
+      - python-httplib2
 
 - name: Add the GitLab package server key
   apt_key: url=https://packages.gitlab.com/gpg.key state=present
@@ -22,7 +23,7 @@
   apt: name=gitlab-ce
 
 - name: Check that gitlab is unavailable
-  uri: url=http://127.0.0.1 return_content=yes
+  uri: url=http://127.0.0.1:{{ gitlab_nginx_listen_port }} return_content=yes validate_certs=no
   register: webpage
   failed_when: false
   changed_when: "webpage.content is not defined or 'gitlab' not in webpage.content"

@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 ## Url on which GitLab will be reachable.
 ## For more details on configuring external_url see:
 ## https://gitlab.com/gitlab-org/omnibus-gitlab/blob/629def0a7a26e7c2326566f0758d4a27857b52a3/README.md#configuring-the-external-url-for-gitlab
@@ -361,8 +362,8 @@ gitlab_rails['gitlab_email_display_name'] = '{{ gitlab_email_display_name }}'
 # nginx['ssl_session_cache'] = "builtin:1000  shared:SSL:10m" # recommended in http://nginx.org/en/docs/http/ngx_http_ssl_module.html
 # nginx['ssl_session_timeout'] = "5m" # default according to http://nginx.org/en/docs/http/ngx_http_ssl_module.html
 # nginx['ssl_dhparam'] = nil # Path to dhparams.pem, eg. /etc/gitlab/ssl/dhparams.pem
-# nginx['listen_addresses'] = ['*']
-nginx['listen_port'] = 80 # override only if you use a reverse proxy: https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md#setting-the-nginx-listen-port
+nginx['listen_addresses'] = ['{{ gitlab_nginx_listen_addresses }}']
+nginx['listen_port'] = {{ gitlab_nginx_listen_port }} # override only if you use a reverse proxy: https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md#setting-the-nginx-listen-port
 # nginx['listen_https'] = nil # override only if your reverse proxy internally communicates over HTTP: https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md#supporting-proxied-ssl
 nginx['listen_https'] = {{ 'true' if gitlab_nginx_listen_https else 'false' }}
 # nginx['custom_gitlab_server_config'] = "location ^~ /foo-namespace/bar-project/raw/ {\n deny all;\n}\n"
