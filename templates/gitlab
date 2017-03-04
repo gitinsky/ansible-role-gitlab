@@ -1,0 +1,1 @@
+59 1 * * *   root    /usr/bin/apt-get update && PATH=/sbin:/usr/sbin:$PATH /usr/bin/apt-get install gitlab-ce

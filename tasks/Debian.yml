@@ -33,3 +33,6 @@
   template: src=gitlab.rb dest=/etc/gitlab/gitlab.rb
   notify: gitlab-ctl reconfigure
   when: gitlab_enable_configuration
+
+- name: put a cron task to auto-update Gitlab
+  template: src=gitlab dest=/etc/cron.d/gitlab
