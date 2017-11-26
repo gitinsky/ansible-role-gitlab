@@ -1,4 +1,4 @@
 - hosts: gitlab
-  sudo: yes
+  become: yes
   roles:
     - { role: gitlab, tags: ['gitlab'] }
