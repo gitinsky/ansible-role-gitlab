@@ -5,6 +5,9 @@
   notify: gitlab web check
 
 - name: gitlab web check
-  uri: url=http://127.0.0.1 return_content=yes validate_certs=no
+  uri:
+    url: http://127.0.0.1
+    return_content: yes
+    validate_certs: no
   register: gitlab_web_check
   failed_when: "gitlab_web_check.content is not defined or 'gitlab' not in gitlab_web_check.content"

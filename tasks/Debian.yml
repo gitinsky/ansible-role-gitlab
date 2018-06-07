@@ -1,38 +1,56 @@
 - name: Install and configure the necessary dependencies and python-httplib2 for ansible
-  apt: name={{ item }}
-  with_items:
+  apt:
+    name:
       - curl
       - openssh-server
       - ca-certificates
       - postfix
       - apt-transport-https
       - python-httplib2
+    state: present
 
 - name: Add the GitLab package server key
-  apt_key: url=https://packages.gitlab.com/gpg.key state=present
+  apt_key:
+    url: https://packages.gitlab.com/gpg.key
+    state: present
 
 - name: Add the GitLab package server
-  apt_repository: repo='{{ item }} https://packages.gitlab.com/gitlab/gitlab-ce/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release }} main'
-                  state=present
-                  update_cache=yes
+  apt_repository:
+    repo: '{{ item }} https://packages.gitlab.com/gitlab/gitlab-ce/{{ ansible_distribution|lower }}/ {{ ansible_distribution_release }} main'
+    state: present
   with_items:
-      - deb
-      - deb-src
+    - deb
+    - deb-src
+  register: repos
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+  when: repos is changed
 
 - name: Install the GitLab package
-  apt: name=gitlab-ce
+  apt:
+    name: gitlab-ce
+    state: present
 
 - name: Check that gitlab is unavailable
-  uri: url=http://127.0.0.1:{{ gitlab_nginx_listen_port }} return_content=yes validate_certs=no
+  uri:
+    url: http://127.0.0.1:{{ gitlab_nginx_listen_port }}
+    return_content: yes
+    validate_certs: no
   register: webpage
   failed_when: false
   changed_when: "webpage.content is not defined or 'gitlab' not in webpage.content"
   notify: gitlab-ctl reconfigure
 
 - name: Put gitlab.rb configuration
-  template: src=gitlab.rb dest=/etc/gitlab/gitlab.rb
+  template:
+    src: gitlab.rb
+    dest: /etc/gitlab/gitlab.rb
   notify: gitlab-ctl reconfigure
   when: gitlab_enable_configuration
 
 - name: put a cron task to auto-update Gitlab
-  template: src=gitlab dest=/etc/cron.d/gitlab
+  template:
+    src: gitlab
+    dest: /etc/cron.d/gitlab
