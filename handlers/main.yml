@@ -4,20 +4,10 @@
   failed_when: "'gitlab Reconfigured' not in gitlab_reconfigure.stdout"
   notify: gitlab web check
 
-- name: gitlab web check -- http
+- name: gitlab web check
   uri:
-    url: http://127.0.0.1
+    url: "{{'https' if gitlab_nginx_listen_https else 'http'}}://127.0.0.1:{{gitlab_nginx_listen_port}}"
     return_content: yes
     validate_certs: no
   register: gitlab_web_check
   failed_when: "gitlab_web_check.content is not defined or 'gitlab' not in gitlab_web_check.content"
-  when: not gitlab_nginx_listen_https
-
-- name: gitlab web check -- https
-  uri:
-    url: https://127.0.0.1
-    return_content: yes
-    validate_certs: no
-  register: gitlab_web_check
-  failed_when: "gitlab_web_check.content is not defined or 'gitlab' not in gitlab_web_check.content"
-  when: gitlab_nginx_listen_https
