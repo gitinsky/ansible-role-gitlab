@@ -28,10 +28,17 @@
     update_cache: yes
   when: repos is changed
 
-- name: Install the GitLab package
+- name: Install the latest version of GitLab
   apt:
     name: gitlab-ce
+    state: latest
+  when: gitlab_version is not defined
+
+- name: Install the specific version of GitLab
+  apt:
+    name: "gitlab-ce={{gitlab_version}}"
     state: present
+  when: gitlab_version is defined
 
 - name: Check that gitlab is unavailable
   uri:
